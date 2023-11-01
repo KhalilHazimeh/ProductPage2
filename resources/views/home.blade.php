@@ -1,19 +1,15 @@
 <?php
 session_start();
-include("head.blade.php");
 $loggedIn = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
-require 'product.blade.php';
+use App\Models\Product;
 $conn = new mysqli("localhost", "root", "", "logindb");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-$product_id = isset($_GET['product_id']) ? $_GET['product_id'] : 1;
-$productInfo = new Product($conn);
-$product = $productInfo->getProduct($product_id);
-if ($product){
 ?>
 <!DOCTYPE html>
 <html lang="en">
+@include('head')
 <body>
     <section class="free_shipping_alert">
         <div>Enjoy FREE SHIPPING on orders over 80 AED</div>
@@ -155,7 +151,7 @@ if ($product){
                 <div class="row flex-nowrap justify-content-between position-relative">
                     <div class="col-xl-3 col-lg-3 header-column-left">
                         <a title="Dr Nutrition UAE | Online Supplement & Nutrition Store" href="https://drnutrition.com/en-ae" class="header-logo">
-                            <img  src="../images/headerlogo.png" alt="logo">
+                            <img  src="../../assets/images/headerlogo.png" alt="logo">
                         </a>
                     </div>
                     <div class="col-xl-7 col-lg-7 header-search-wrap">
@@ -234,18 +230,18 @@ if ($product){
     </section>
     <section class="info">
         <form id= "addToCartForm">
-            <input type="hidden" name="product_id" value= "<?php echo $product_id ?>">
-            <input type="hidden" name="name" value= "<?php echo $product['name']; ?>">
-            <input type="hidden" name="price" value="<?php  echo $product['price']; ?>">
+            <input type="hidden" name="product_id" value= "{{$product['id']}}">
+            <input type="hidden" name="name" value= "{{ $product['name'] }}">
+            <input type="hidden" name="price" value="{{ $product['price'] }}">
             <input type="hidden" name="quantity" value="1">
-            <input type="hidden" name="option1" value= "<?php 'Size' ?>">
-            <input type="hidden" name="option1_Id" value= "<?php 'Size' ?>">
+            <input type="hidden" name="option1" value= "">
+            <input type="hidden" name="option1_Id" value= "">
             <input type="hidden" name="option2" value= "">
             <input type="hidden" name="option2_Id" value= "">
         <div class="info">
             <div class="row">
                 <div class="col-xl-4 col-lg-4 image-box">
-                    <img class=" product-img img-fluid" src="<?php echo $product['image'];?>" alt="">
+                    <img class=" product-img img-fluid" src="{{ $product['image'] }}" alt="">
                 </div>
                 <div class="col-xl-5 col-lg-5 details">
                     <div class="details-info">
@@ -253,7 +249,7 @@ if ($product){
                         <span class="free-delivery"><i class="las la-truck"></i>
                             Free Delivery On Orders Above AED&nbsp;80
                         </span>
-                        <p id="brand-title">Brand: <?php echo $product['brand_name']; ?></p>
+                        <p id="brand-title">Brand: {{$product['brand_name']}}</p>
                     </div>
                     <div class="details-info-middle">
                         <div class="product-variants">
@@ -354,16 +350,13 @@ if ($product){
                             <li>
                                 <label>Categories:</label>
                                 <div>
-                                    <?php
-                                        echo '<ul class="list-inline form-custom-radio custom-selection">';
-                                        $categoryNames = $productInfo->getProductCategories($product_id);
-                                        foreach ($categoryNames  as $categoryName) {
-                                            echo '<li class="">';
-                                            echo '<span href="#" class="option-label">' . $categoryName . ' </span>';
-                                            echo '</li>';
-                                        }
-                                        echo '</ul>';
-                                    ?>
+                                    <ul class="list-inline form-custom-radio custom-selection">
+                                        @foreach ($product->categories as $category)
+                                            <li class="">
+                                                <span href="#" class="option-label">{{ $category->category_name }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                     </div>
                             </li>
                         </ul>
@@ -413,18 +406,13 @@ if ($product){
 </div>
 </form>
 </section>
-    <script src="../js/app.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-    <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/all.min.js"></script>
-    <script src="../js/bootstrap.js"></script>
+    <script src="../../assets/js/app.js?v={{ time() }}"></script>
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/all.min.js"></script>
+    <script src="../../assets/js/bootstrap.js"></script>
 </body>
 </html>
 <?php
-} else {
-    // Failed to retrieve product details
-    echo "Product not found.";
-}
 $conn->close();
-
 ?>

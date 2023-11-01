@@ -1,4 +1,3 @@
-import './bootstrap';
 
 //counter starts from 1 till 10 not lower nor higher
 var counter = 1;
