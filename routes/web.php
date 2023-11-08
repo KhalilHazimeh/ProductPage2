@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
+Route::get('/', function () {
+    return view('homepage');
+});
 
 Route::get('/checkout', function () {
     return view('checkout');
 });
 
-Route::get('/{porudct_id}', 'App\Http\Controllers\ProductController@show');
+Route::get('/product/{porudct_id}', 'App\Http\Controllers\ProductController@show');
 
