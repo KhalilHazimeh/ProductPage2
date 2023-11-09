@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('homepage');
+    return view('home');
 });
 
 Route::get('/checkout', function () {
     return view('checkout');
 });
 
-Route::get('/product/{porudct_id}', 'App\Http\Controllers\ProductController@show');
+Route::get('/products/{porudct_id}', 'App\Http\Controllers\ProductController@show');
+
+Route::get('/admin/products', 'App\Http\Controllers\ProductController@showProducts');
 

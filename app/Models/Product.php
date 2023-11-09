@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $table_name = 'products';
-    protected $fillable = ['name', 'price', 'old_price', 'image', 'brandid', 'brand_name'];
+    protected $fillable = ['name', 'price', 'oldprice', 'image', 'brandid'];
 
     public function getProduct($id) {
         $product = Product::with('brand')->find($id);
@@ -42,12 +42,12 @@ class Product extends Model
 
 
     public function getAllProductValues() {
-        $products = Product::select('products.id', 'products.name', 'products.price', 'products.old_price', 'brands.brand_name')
+        $products = Product::select('products.id', 'products.name', 'products.price', 'products.oldprice')
             ->selectRaw('GROUP_CONCAT(DISTINCT categories.category_name ORDER BY categories.category_name ASC) AS categories')
             ->leftJoin('product_categories', 'products.id', '=', 'product_categories.product_id')
             ->leftJoin('categories', 'product_categories.category_id', '=', 'categories.category_id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.brand_id')
-            ->groupBy('products.id')
+            ->groupBy(['products.id'])
             ->get();
 
         return ['products' => $products, 'count' => $products->count()];

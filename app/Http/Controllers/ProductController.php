@@ -13,6 +13,14 @@ class ProductController extends Controller
     $product = Product::find($product_id);
 
     // Pass the product data to the view and return it
-    return view('home', compact('product','product_id'));
+    return view('products.show', compact('product','product_id'));
 }
+
+public function showProducts()
+    {
+        $products = Product::all();
+        $productCount = $products->count();
+        return view('admin.products.index', compact('products','productCount'));
+    }
+
 }
