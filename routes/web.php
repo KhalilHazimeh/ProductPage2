@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,13 @@ Route::get('/products/{porudct_id}', 'App\Http\Controllers\ProductController@sho
 
 Route::get('/admin/products', 'App\Http\Controllers\ProductController@showProducts');
 
+Route::get('/admin/categories', 'App\Http\Controllers\ProductController@showCategories');
+
+Route::get('/admin/brands', 'App\Http\Controllers\ProductController@showBrands');
+
+Route::get('/admin/options', 'App\Http\Controllers\ProductController@showOptions');
+
+Route::get('/admin/options_categories', 'App\Http\Controllers\ProductController@showOptionsCategories');
+
+Route::get('/admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AdminController::class, 'login']);

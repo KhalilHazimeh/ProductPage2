@@ -58,27 +58,27 @@ if ($conn->connect_error) {
         <div class="position-sticky">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="products.php">
+                    <a class="nav-link active" href="products">
                         Products
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="categories.php">
+                    <a class="nav-link" href="categories">
                         Categories
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="brands.php">
+                    <a class="nav-link" href="brands">
                         Brands
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="options_categories.php">
+                    <a class="nav-link" href="options_categories">
                         Options Categories
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="options.php">
+                    <a class="nav-link" href="options">
                         Options
                     </a>
                 </li>
