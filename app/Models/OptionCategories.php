@@ -13,29 +13,4 @@ class OptionCategories extends Model
     {
         return $this->belongsTo(Option::class, 'option_id', 'id');
     }
-
-    public function getAllOptionCategories() {
-        $optionsCat = OptionCategories::all();
-        $count = $optionsCat->count();
-        return ['optionsCat' => $optionsCat, 'count' => $count];
-    }
-
-    public function addOptionCat($id, $name) {
-        $optionsCat = new Option();
-        $optionsCat->option_id = $id;
-        $optionsCat->value_name = $name;
-        $optionsCat->save();
-
-        return $optionsCat->id;
-    }
-    public function deleteOptionCat($id) {
-        $optionsCat = Option::find($id);
-
-        if ($optionsCat) {
-            $optionsCat->delete();
-            return true;
-        }
-
-        return false;
-    }
 }

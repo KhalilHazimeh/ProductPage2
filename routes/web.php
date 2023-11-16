@@ -15,16 +15,23 @@ use App\Http\Controllers\AdminController;
 */
 
 Route::get('/', function () {
-    return view('home');
+    return view('pages.home');
 });
 
 Route::get('/checkout', function () {
     return view('checkout');
 });
 
-Route::get('/products/{porudct_id}', 'App\Http\Controllers\ProductController@show');
+Route::get('/products/{product_id}', 'App\Http\Controllers\ProductController@show')->name('products.show');
 
 Route::get('/admin/products', 'App\Http\Controllers\ProductController@showProducts');
+Route::post('/admin/products/add', 'App\Http\Controllers\ProductController@addProduct')->name('product.add');
+Route::delete('/product/delete', 'App\Http\Controllers\ProductController@deleteProduct')->name('product.delete');
+Route::post('/fetchOptionValues', 'App\Http\Controllers\ProductController@fetchOptionValues')->name('fetchOptionValues');
+Route::get('/admin/products/edit/{product_id}', 'App\Http\Controllers\ProductController@edit')->name('products.edit');
+Route::post('/products/update/{product_id}', 'App\Http\Controllers\ProductController@update')->name('products.update')->middleware('web');
+Route::post('/fetchExistingValues', 'App\Http\Controllers\ProductController@fetchExistingValues')->name('fetchExistingValues');
+
 
 Route::get('/admin/categories', 'App\Http\Controllers\ProductController@showCategories');
 
