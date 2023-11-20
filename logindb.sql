@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2023 at 02:35 PM
+-- Generation Time: Nov 20, 2023 at 01:42 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.1.17
 
@@ -61,6 +61,18 @@ INSERT INTO `categories` (`category_id`, `category_name`) VALUES
 (2, 'Whey Protein Isolate'),
 (3, 'Sport Gainer'),
 (9, 'Mass Gainer');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -176,7 +188,6 @@ INSERT INTO `order_products` (`order_product_id`, `order_id`, `product_id`, `opt
 (5, 4, 1, 14, 5, 1, 1241.00),
 (6, 4, 2, 17, 5, 2, 638.00),
 (7, 4, 2, 14, 9, 2, 638.00),
-(8, 4, 34, 15, 0, 1, 410.00),
 (9, 5, 2, 19, 5, 1, 319.00),
 (10, 5, 2, 17, 5, 1, 319.00),
 (11, 5, 2, 14, 9, 1, 319.00);
@@ -192,7 +203,7 @@ CREATE TABLE `products` (
   `name` varchar(255) NOT NULL,
   `price` int(11) NOT NULL,
   `oldprice` int(11) NOT NULL,
-  `image` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `brand_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -201,10 +212,9 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `price`, `oldprice`, `image`, `brand_id`) VALUES
-(1, 'Khalil Hazimeh', 1241, 121, '../..\\assets\\images\\BsPIf08zG9TFDvJkgT75QEUHpDiq1CGxMxdv1ujM.jpg', 1),
+(1, 'Khalil Hazimeh', 1241, 1211, '../..\\assets\\images\\BsPIf08zG9TFDvJkgT75QEUHpDiq1CGxMxdv1ujM.jpg', 1),
 (2, 'Lapreva Boduy Bilder', 319, 121, '../..\\assets\\images\\cbQSvFiAo9zMDGSZVZaeVBXnufColeuYiRzMtwce.jpg', 2),
-(3, 'Mr. Lilac', 319, 312, '../..\\assets\\images\\nwGM1Rzm9Q8rtxuSEi0buHcjfBmhz077VyzROqoC.png', 8),
-(34, 'Mass Gainer', 410, 436, '../..\\assets\\images\\BsPIf08zG9TFDvJkgT75QEUHpDiq1CGxMxdv1ujM.jpg', 8);
+(3, 'Mr. Lilac', 319, 312, '../..\\assets\\images\\nwGM1Rzm9Q8rtxuSEi0buHcjfBmhz077VyzROqoC.png', 8);
 
 -- --------------------------------------------------------
 
@@ -224,17 +234,9 @@ CREATE TABLE `product_categories` (
 INSERT INTO `product_categories` (`product_id`, `category_id`) VALUES
 (0, 1),
 (1, 1),
-(1, 2),
+(1, 3),
 (2, 2),
-(3, 2),
-(34, 1),
-(34, 2),
-(34, 3),
-(35, 2),
-(35, 3),
-(36, 1),
-(37, 1),
-(37, 2);
+(3, 2);
 
 -- --------------------------------------------------------
 
@@ -257,8 +259,7 @@ INSERT INTO `product_options` (`id`, `product_id`, `option_id`) VALUES
 (137, 2, 2),
 (148, 3, 1),
 (152, 1, 1),
-(153, 1, 2),
-(158, 34, 1);
+(153, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -286,8 +287,7 @@ INSERT INTO `product_option_combinations` (`id`, `product_id`, `first_option_id`
 (116, 2, 1, 28, 2, 5),
 (141, 1, 1, 18, 2, 8),
 (142, 1, 1, 14, 2, 5),
-(143, 1, 1, 29, 2, 5),
-(148, 34, 1, 15, NULL, NULL);
+(143, 1, 1, 29, 2, 5);
 
 -- --------------------------------------------------------
 
@@ -328,6 +328,12 @@ ALTER TABLE `categories`
   ADD PRIMARY KEY (`category_id`);
 
 --
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `options`
 --
 ALTER TABLE `options`
@@ -351,8 +357,8 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `order_products`
   ADD PRIMARY KEY (`order_product_id`),
-  ADD KEY `order_id` (`order_id`),
-  ADD KEY `product_id` (`product_id`);
+  ADD KEY `order_products_ibfk_1` (`order_id`),
+  ADD KEY `order_products_ibfk_2` (`product_id`);
 
 --
 -- Indexes for table `products`
@@ -410,6 +416,12 @@ ALTER TABLE `categories`
   MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `options`
 --
 ALTER TABLE `options`
@@ -437,19 +449,19 @@ ALTER TABLE `order_products`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `product_options`
 --
 ALTER TABLE `product_options`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=159;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
 
 --
 -- AUTO_INCREMENT for table `product_option_combinations`
 --
 ALTER TABLE `product_option_combinations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=188;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -471,8 +483,8 @@ ALTER TABLE `option_values`
 -- Constraints for table `order_products`
 --
 ALTER TABLE `order_products`
-  ADD CONSTRAINT `order_products_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
-  ADD CONSTRAINT `order_products_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+  ADD CONSTRAINT `order_products_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `order_products_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `products`
