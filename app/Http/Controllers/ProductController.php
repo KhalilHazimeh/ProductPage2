@@ -52,31 +52,32 @@ public function showProducts()
         $product->options()->attach($insertedOptionIds);
 
         $combinationData = [];
-
-        foreach ($request->input('combinations') as $optionId => $values) {
+        if($request->input('combinations')){
+        foreach ($request->input('combinations')[$insertedOptionIds[0]] as $key=>$firstOptionValueId) {
+            $firstOptionId = $insertedOptionIds[0];
             $secondOptionId = null;
-
             if (count($insertedOptionIds) == 2) {
                 $secondOptionId = $insertedOptionIds[1];
             }
 
-            $valueCount = count($values);
+            $firstOptionValues = $firstOptionId ? $request->input('combinations')[$firstOptionId] : [];
+
             $secondOptionValues = $secondOptionId ? $request->input('combinations')[$secondOptionId] : [];
 
-            $maxCount = max($valueCount, count($secondOptionValues));
-
-            for ($i = 0; $i < $maxCount; $i++) {
+            //$maxCount = max(count($firstOptionValues), count($secondOptionValues));
+            //for ($i = 0; $i < $maxCount; $i++) {
                 $combinationData[] = [
                     'product_id' => $product->id,
-                    'first_option_id' => $optionId,
-                    'first_option_value_id' => isset($values[$i]) ? $values[$i] : null,
+                    'first_option_id' => $firstOptionId,
+                    'first_option_value_id' => $firstOptionValueId,
                     'second_option_id' => $secondOptionId,
-                    'second_option_value_id' => isset($secondOptionValues[$i]) ? $secondOptionValues[$i] : null,
+                    'second_option_value_id' => isset($secondOptionValues[$key]) ? $secondOptionValues[$key] : null,
                 ];
-            }
+            //}
         }
 
         OptionCombination::insert($combinationData);
+        }
 
         return redirect('/admin/products')->with('success', 'Product added successfully');
     }
