@@ -20,4 +20,6 @@
             return $this->hasMany(OptionCombination::class, 'product_id');
         }
 
+
+
     }

@@ -38,6 +38,7 @@ class Product extends Model
     return $this->hasMany(OptionCombination::class, 'product_id');
 }
 
+
     public function getProductCategories($id) {
         $product = Product::find($id);
 
@@ -48,5 +49,10 @@ class Product extends Model
 
         return [];
     }
+
+    public function option_combinations()
+{
+    return $this->hasMany(OptionCombination::class, 'product_id');
+}
     }
 

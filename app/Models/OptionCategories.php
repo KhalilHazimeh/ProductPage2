@@ -13,4 +13,5 @@ class OptionCategories extends Model
     {
         return $this->belongsTo(Option::class, 'option_id', 'id');
     }
+
 }

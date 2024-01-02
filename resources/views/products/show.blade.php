@@ -25,21 +25,34 @@
                     </div>
                     <div class="details-info-middle">
                         <div class="product-variants">
-                            <?php
-                            $value_id = 1;
-                            $value_name = 'Chocolate';
-                            ?>
-                            <div class="form-group variant-custom-selection">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <ul id="optionList{{$product['id']}}" class="list-inline form-custom-radio custom-selection">
-                                            <li id="li_size_{{$value_id}}" data-id="{{$value_id}}" class="option1">
-                                            <span href="#" class="option-label"> {{ $value_name }}</span>
-                                            </li>
-                                        </ul>
+                            @foreach ($product->options as $option)
+                                <div class="form-group variant-custom-selection">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <label>{{ $option->name }}</label><br>
+                                            <ul id="optionList{{ $product['id'] }}" class="list-inline form-custom-radio custom-selection">
+                                                @foreach ($product->combinations as $combination)
+                                                    @if ($combination->first_option_id == $option->id)
+                                                        @php
+                                                            $firstOptionCategory = \App\Models\OptionCategories::find($combination->first_option_value_id);
+                                                        @endphp
+                                                        <li id="li_size_{{ $combination->id }}" data-id="{{ $combination->id }}" class="option{{ $option->id }} first-option">
+                                                            <span href="#" class="option-label">{{ $firstOptionCategory->value_name }}</span>
+                                                        </li>
+                                                    @elseif ($combination->second_option_id == $option->id)
+                                                        @php
+                                                            $secondOptionCategory = \App\Models\OptionCategories::find($combination->second_option_value_id);
+                                                        @endphp
+                                                        <li id="li_size_{{ $combination->id }}" data-id="{{ $combination->id }}" class="option{{ $option->id }} second-option">
+                                                            <span href="#" class="option-label">{{ $secondOptionCategory->value_name }}</span>
+                                                        </li>
+                                                    @endif
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 

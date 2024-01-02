@@ -148,7 +148,6 @@
     </div>
     </div>
     </section>
-
     <div id="edit" style="padding:5%">
         <form action="{{ route('products.update', ['product_id' => $product->id]) }}" method="POST">
             @csrf
@@ -205,10 +204,34 @@
                         <table class="table">
                             <thead>
                                 <tr id="tableHeadRow">
+                                    @foreach ($product->options as $option)
+                                        <th>{{ $option->name }}</th>
+                                    @endforeach
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="existingValuesTableBody">
+                                @foreach ($product->option_combinations as $combination)
+                                    <tr>
+                                        @foreach ($product->options as $option)
+                                            <td>
+                                                <select>
+                                                    @foreach ($optionsCat as $optionCategory)
+                                                        @if ($optionCategory->option_id == $option->id)
+                                                            <option value="{{$optionCategory->id}}" {{ in_array($optionCategory->value_name, optional($combination->optionsCat)->pluck('value_name') ?? []) ? 'selected' : '' }}>
+                                                                {{ $optionCategory->value_name }}
+                                                            </option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                        @endforeach
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-success" onclick="addRow(this)">Add</button>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteRow(this)">Delete</button>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -225,50 +248,30 @@
 <script src="../../../assets/js/bootstrap.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
-$(document).ready(function () {
-    var productId = {{ $product->id }};
+    function addRow(button) {
+    var row = button.closest('tr').cloneNode(true);
+    row.querySelector('select').value = '';
 
-    function loadExistingValues() {
-        $.ajax({
-            url: '{{ route("fetchExistingValues") }}',
-            method: 'POST',
-            data: { product_id: productId, _token: '{{ csrf_token() }}' },
-            dataType: 'json',
-            success: function (response) {
-                var tableHeadRow = $('#tableHeadRow');
-                var tableBody = $('#existingValuesTableBody');
-                tableHeadRow.empty();
+    var optionsCatSelect = row.querySelector('select');
+    optionsCatSelect.innerHTML = button.closest('tr').querySelector('select').innerHTML;
 
-                $.each(response.optionNames, function (optionId, optionName) {
-                    tableHeadRow.append('<th data-option-id="' + optionId + '" style="width:"30%">' + optionName + '</th>');
-                });
-                tableHeadRow.append('<th>Action</th>');
+    var buttons = row.querySelectorAll('button');
+    buttons[0].innerText = 'Add';
+    buttons[0].classList.remove('btn-danger');
+    buttons[0].classList.add('btn-success');
+    buttons[0].setAttribute('onclick', 'addRow(this)');
 
-                $.each(response.values, function (index, values) {
-                    var row = '<tr>';
-                    $.each(values, function (key, value) {
-                        if (key.includes('option_id')) {
-                        } else if (key.includes('value_id')) {
-                            row += '<td>' + response.optionValueNames[value] + '</td>';
-                        }
-                    });
-                    row += '<td><button class="btn btn-danger remove-row">Remove</button></td>';
-                    row += '<td><button class="btn btn-success add-row">Add</button></td>';
-                    row += '</tr>';
-                    tableBody.append(row);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error('XHR:', xhr);
-                console.error('Status:', status);
-                console.error('Error:', error);
-            }
-        });
+    buttons[1].innerText = 'Delete';
+    buttons[1].classList.remove('btn-success');
+    buttons[1].classList.add('btn-danger');
+    buttons[1].setAttribute('onclick', 'deleteRow(this)');
+
+    button.closest('tr').after(row);
     }
 
-    loadExistingValues();
-});
-
+    function deleteRow(button) {
+        button.closest('tr').remove();
+    }
 </script>
 </body>
 </html>
