@@ -142,8 +142,10 @@ public function showProducts()
                     'second_option_value_id' => isset($secondOptionValues[$key]) ? $secondOptionValues[$key] : null,
                 ];
         }
-        OptionCombination::insert($combinationData);
+
         }
+        $product->option_combinations()->delete();
+        OptionCombination::insert($combinationData);
 
     return redirect('/admin/products')->with('success', 'Product updated successfully');
 }

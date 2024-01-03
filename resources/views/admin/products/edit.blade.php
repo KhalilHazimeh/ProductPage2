@@ -215,10 +215,10 @@
                                     <tr>
                                         @foreach ($product->options as $option)
                                             <td>
-                                                <select>
+                                                <select name="name="combinations[{{ $option->id }}][]">
                                                     @foreach ($optionsCat as $optionCategory)
                                                         @if ($optionCategory->option_id == $option->id)
-                                                            <option value="{{$optionCategory->id}}" {{ in_array($optionCategory->value_name, optional($combination->optionsCat)->pluck('value_name') ?? []) ? 'selected' : '' }}>
+                                                            <option value="{{$optionCategory->id}}" {{ in_array($optionCategory->id, $product->combinations->pluck('id')->toArray()) ? 'selected' : '' }}>
                                                                 {{ $optionCategory->value_name }}
                                                             </option>
                                                         @endif
@@ -236,7 +236,7 @@
                         </table>
                     </div>
             <div class="modal-footer">
-                <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                <input type="button" class="btn btn-default" value="Cancel" onclick="goBack()">
                 <button type="submit" class="btn btn-info">Save</button>
             </div>
         </form>
@@ -271,6 +271,11 @@
 
     function deleteRow(button) {
         button.closest('tr').remove();
+    }
+</script>
+<script>
+    function goBack() {
+        window.history.back();
     }
 </script>
 </body>
