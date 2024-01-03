@@ -30,7 +30,6 @@ Route::delete('/product/delete', 'App\Http\Controllers\ProductController@deleteP
 Route::post('/fetchOptionValues', 'App\Http\Controllers\ProductController@fetchOptionValues')->name('fetchOptionValues');
 Route::get('/admin/products/edit/{product_id}', 'App\Http\Controllers\ProductController@edit')->name('products.edit');
 Route::post('/products/update/{product_id}', 'App\Http\Controllers\ProductController@update')->name('products.update')->middleware('web');
-Route::post('/fetchExistingValues', 'App\Http\Controllers\ProductController@fetchExistingValues')->name('fetchExistingValues');
 
 
 Route::get('/admin/categories', 'App\Http\Controllers\ProductController@showCategories');

@@ -215,10 +215,13 @@
                                     <tr>
                                         @foreach ($product->options as $option)
                                             <td>
-                                                <select name="name="combinations[{{ $option->id }}][]">
+                                                <select name="combinations[{{ $option->id }}][]">
+                                                    <option value="" disabled>Select {{ $option->name }}</option>
                                                     @foreach ($optionsCat as $optionCategory)
                                                         @if ($optionCategory->option_id == $option->id)
-                                                            <option value="{{$optionCategory->id}}" {{ in_array($optionCategory->id, $product->combinations->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                                            <option value="{{ $optionCategory->id }}"
+                                                                {{ ($optionCategory->id == $combination->first_option_value_id) || ($optionCategory->id == $combination->second_option_value_id) ? 'selected' : '' }}
+                                                            >
                                                                 {{ $optionCategory->value_name }}
                                                             </option>
                                                         @endif
@@ -241,38 +244,45 @@
             </div>
         </form>
     </div>
+
+
 <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 <script src="../../../assets/js/app.js?v={{ time() }}"></script>
 <script src="../../../assets/js/bootstrap.bundle.min.js"></script>
 <script src="../../../assets/js/all.min.js"></script>
 <script src="../../../assets/js/bootstrap.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+<!--Script to add and delete rows for edit product-->
 <script>
     function addRow(button) {
-    var row = button.closest('tr').cloneNode(true);
-    row.querySelector('select').value = '';
+        var row = button.closest('tr').cloneNode(true);
+        var selects = row.querySelectorAll('select');
+        selects.forEach(function(select) {
+            select.value = '';
+        });
+        var buttons = row.querySelectorAll('button');
+        buttons[0].innerText = 'Add';
+        buttons[0].classList.remove('btn-danger');
+        buttons[0].classList.add('btn-success');
+        buttons[0].setAttribute('onclick', 'addRow(this)');
 
-    var optionsCatSelect = row.querySelector('select');
-    optionsCatSelect.innerHTML = button.closest('tr').querySelector('select').innerHTML;
+        buttons[1].innerText = 'Delete';
+        buttons[1].classList.remove('btn-success');
+        buttons[1].classList.add('btn-danger');
+        buttons[1].setAttribute('onclick', 'deleteRow(this)');
 
-    var buttons = row.querySelectorAll('button');
-    buttons[0].innerText = 'Add';
-    buttons[0].classList.remove('btn-danger');
-    buttons[0].classList.add('btn-success');
-    buttons[0].setAttribute('onclick', 'addRow(this)');
-
-    buttons[1].innerText = 'Delete';
-    buttons[1].classList.remove('btn-success');
-    buttons[1].classList.add('btn-danger');
-    buttons[1].setAttribute('onclick', 'deleteRow(this)');
-
-    button.closest('tr').after(row);
+        button.closest('tr').after(row);
     }
 
     function deleteRow(button) {
         button.closest('tr').remove();
     }
 </script>
+
+
+<!--Script to close edit product-->
 <script>
     function goBack() {
         window.history.back();

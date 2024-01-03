@@ -11,6 +11,7 @@ use App\Models\OptionCombination;
 use App\Models\ProductOption;
 
 
+
 class ProductController extends Controller
 {
     public function show($product_id)
@@ -19,7 +20,7 @@ class ProductController extends Controller
     return view('products.show', compact('product'));
 }
 
-public function showProducts()
+    public function showProducts()
     {
         $categories = Category::all();
         $brands = Brand::all();
@@ -28,6 +29,45 @@ public function showProducts()
         $products = Product::all();
         return view('admin.products.product', compact('products','brands','categories','options','optionsCat'));
     }
+
+    private function insertCombinations(Product $product, $insertedOptionIds, $combinationsData)
+{
+    $combinationData = [];
+
+    // Create a hash table to keep track of unique combinations
+    $uniqueCombinations = [];
+
+    foreach ($combinationsData[$insertedOptionIds[0]] ?? [] as $key => $firstOptionValueId) {
+        $firstOptionId = $insertedOptionIds[0];
+        $secondOptionId = null;
+
+        if (count($insertedOptionIds) == 2) {
+            $secondOptionId = $insertedOptionIds[1];
+        }
+
+        $firstOptionValues = $firstOptionId ? $combinationsData[$firstOptionId] : [];
+        $secondOptionValues = $secondOptionId ? $combinationsData[$secondOptionId] : [];
+
+        $combination = [
+            'product_id' => $product->id,
+            'first_option_id' => $firstOptionId,
+            'first_option_value_id' => $firstOptionValueId,
+            'second_option_id' => $secondOptionId,
+            'second_option_value_id' => isset($secondOptionValues[$key]) ? $secondOptionValues[$key] : null,
+        ];
+
+        $combinationKey = implode('-', $combination);
+
+        if (!isset($uniqueCombinations[$combinationKey])) {
+            $uniqueCombinations[$combinationKey] = true;
+            $combinationData[] = $combination;
+        }
+    }
+    OptionCombination::insert($combinationData);
+}
+
+
+
 
     public function addProduct(Request $request)
     {
@@ -46,30 +86,9 @@ public function showProducts()
         $insertedOptionIds = $request->input('product_options');
         $product->options()->attach($insertedOptionIds);
 
-        $combinationData = [];
+        $combinationData = $request->input('combinations');
+        $this->insertCombinations($product, $insertedOptionIds, $combinationData);
 
-        if($request->input('combinations')){
-        foreach ($request->input('combinations')[$insertedOptionIds[0]] as $key=>$firstOptionValueId) {
-            $firstOptionId = $insertedOptionIds[0];
-            $secondOptionId = null;
-
-            if (count($insertedOptionIds) == 2) {
-                $secondOptionId = $insertedOptionIds[1];
-            }
-
-            $firstOptionValues = $firstOptionId ? $request->input('combinations')[$firstOptionId] : [];
-            $secondOptionValues = $secondOptionId ? $request->input('combinations')[$secondOptionId] : [];
-
-                $combinationData[] = [
-                    'product_id' => $product->id,
-                    'first_option_id' => $firstOptionId,
-                    'first_option_value_id' => $firstOptionValueId,
-                    'second_option_id' => $secondOptionId,
-                    'second_option_value_id' => isset($secondOptionValues[$key]) ? $secondOptionValues[$key] : null,
-                ];
-        }
-        OptionCombination::insert($combinationData);
-        }
 
         return redirect('/admin/products')->with('success', 'Product added successfully');
     }
@@ -107,48 +126,37 @@ public function showProducts()
 
     public function update(Request $request, $product_id)
 {
-    $product = Product::find($product_id);
+    // Validate the incoming request data
+    $request->validate([
+        'title' => 'required|string',
+        'price' => 'required|numeric',
+        'oldPrice' => 'required|numeric',
+        'brandID' => 'required|exists:brands,brand_id',
+        'categories' => 'array',
+        'product_options' => 'array',
+        'combinations' => 'array',
+    ]);
+
+    $product = Product::findOrFail($product_id);
 
     $product->name = $request->input('title');
     $product->price = $request->input('price');
     $product->oldprice = $request->input('oldPrice');
     $product->brand_id = $request->input('brandID');
 
+    $product->categories()->sync($request->input('categories'));
+
+    $product->options()->sync($request->input('product_options'));
+
+    $combinations = $request->input('combinations');
+    $product->option_combinations()->delete();
+    $this->insertCombinations($product, $product->options->pluck('id')->toArray(), $combinations);
+
     $product->save();
-
-    $product->categories()->sync($request->input('categories', []));
-    $insertedOptionIds = $request->input('product_options');
-    $product->options()->sync($insertedOptionIds);
-
-        $combinationData = [];
-
-        if($request->input('combinations')){
-        foreach ($request->input('combinations')[$insertedOptionIds[0]] as $key=>$firstOptionValueId) {
-            $firstOptionId = $insertedOptionIds[0];
-            $secondOptionId = null;
-
-            if (count($insertedOptionIds) == 2) {
-                $secondOptionId = $insertedOptionIds[1];
-            }
-
-            $firstOptionValues = $firstOptionId ? $request->input('combinations')[$firstOptionId] : [];
-            $secondOptionValues = $secondOptionId ? $request->input('combinations')[$secondOptionId] : [];
-
-                $combinationData[] = [
-                    'product_id' => $product->id,
-                    'first_option_id' => $firstOptionId,
-                    'first_option_value_id' => $firstOptionValueId,
-                    'second_option_id' => $secondOptionId,
-                    'second_option_value_id' => isset($secondOptionValues[$key]) ? $secondOptionValues[$key] : null,
-                ];
-        }
-
-        }
-        $product->option_combinations()->delete();
-        OptionCombination::insert($combinationData);
 
     return redirect('/admin/products')->with('success', 'Product updated successfully');
 }
+
 
     public function fetchOptionValues(Request $request)
     {
