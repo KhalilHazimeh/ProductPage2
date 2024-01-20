@@ -86,9 +86,33 @@ class ProductController extends Controller
         $insertedOptionIds = $request->input('product_options');
         $product->options()->attach($insertedOptionIds);
 
-        $combinationData = $request->input('combinations');
-        $this->insertCombinations($product, $insertedOptionIds, $combinationData);
+        $combinationData = [];
+        if($request->input('combinations')){
+        foreach ($request->input('combinations')[$insertedOptionIds[0]] as $key=>$firstOptionValueId) {
+            $firstOptionId = $insertedOptionIds[0];
+            $secondOptionId = null;
+            if (count($insertedOptionIds) == 2) {
+                $secondOptionId = $insertedOptionIds[1];
+            }
 
+            $firstOptionValues = $firstOptionId ? $request->input('combinations')[$firstOptionId] : [];
+
+            $secondOptionValues = $secondOptionId ? $request->input('combinations')[$secondOptionId] : [];
+
+            //$maxCount = max(count($firstOptionValues), count($secondOptionValues));
+            //for ($i = 0; $i < $maxCount; $i++) {
+                $combinationData[] = [
+                    'product_id' => $product->id,
+                    'first_option_id' => $firstOptionId,
+                    'first_option_value_id' => $firstOptionValueId,
+                    'second_option_id' => $secondOptionId,
+                    'second_option_value_id' => isset($secondOptionValues[$key]) ? $secondOptionValues[$key] : null,
+                ];
+            //}
+        }
+
+        OptionCombination::insert($combinationData);
+        }
 
         return redirect('/admin/products')->with('success', 'Product added successfully');
     }
